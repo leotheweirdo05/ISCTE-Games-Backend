@@ -24,9 +24,9 @@ mongoose.connect(process.env.MONGO_URI, {
   retryWrites: true,
   w: "majority"
 })
-.then(() => console.log('Conectado ao MongoDB com sucesso!'))
+.then(() => console.log('MongoDb Connected Successfully!'))
 .catch(err => {
-  console.error('Erro na conexão com MongoDB:', err.message);
+  console.error('Error connecting with MongoDB:', err.message);
   console.error('Stack trace:', err.stack);
 });
 
