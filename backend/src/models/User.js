@@ -26,6 +26,22 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  
+  lastLoginLocation: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      default: undefined,
+    },
+    city: String,
+    country: String,
+    ip: String,
+    updatedAt: Date,
+  },
 });
 
 UserSchema.pre("save", async function (next) {
