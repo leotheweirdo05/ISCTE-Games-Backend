@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
+import scoreRoutes from "./routes/scoreRoutes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.get("/", (req, res) => {
 
 // Rotas da API
 app.use("/api/auth", authRoutes);
+app.use("/api/scores", scoreRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

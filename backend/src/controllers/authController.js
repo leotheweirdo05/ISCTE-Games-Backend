@@ -15,7 +15,8 @@ export const register = async (req, res) => {
         .json({status: "error", message: "All fields are required"});
     }
 
-    // Normalize email
+    // Normalize email and name
+    name = name.trim().replace(/<[^>]*>/g, "").replace(/\s+/g, " ");
     email = email.trim().toLowerCase();
 
     // Password policy: at least 8 chars, 1 number, 1 letter
@@ -55,12 +56,21 @@ export const register = async (req, res) => {
       tipo,
     });
 
-    // Placeholder for email verification logic
-    // sendVerificationEmail(user.email);
-
+    // Generate JWT token after registration
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        status: "error",
+        message: "JWT secret is not set in environment variables",
+      });
+    }
+    const token = jwt.sign(
+      {id: user._id, tipo: user.tipo},
+      process.env.JWT_SECRET,
+      {expiresIn: "1h"}
+    );
     user.password = undefined;
     console.log(`User registered: ${email}`);
-    res.status(201).json({status: "success", user});
+    res.status(201).json({status: "success", token, user});
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({status: "error", message: error.message});
