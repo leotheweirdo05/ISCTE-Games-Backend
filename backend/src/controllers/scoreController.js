@@ -20,17 +20,17 @@ export const submitScore = async (req, res) => {
   }
 };
 
-// Get leaderboard (top 3 high scores per game)
+// Get leaderboard (top 5 high scores per game)
 export const getLeaderboard = async (req, res) => {
   try {
     const {game} = req.query;
     if (!game) {
       return res.status(400).json({message: "Game is required in query."});
     }
-    // Top 3 scores for the specified game
+    // Top 5 scores for the specified game
     const scores = await Score.find({game})
       .sort({score: -1, createdAt: 1})
-      .limit(3)
+      .limit(5)
       .populate("user", "name email");
     res.json(scores);
   } catch (err) {
