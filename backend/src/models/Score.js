@@ -12,7 +12,7 @@ const ScoreSchema = new mongoose.Schema({
   },
   game: {
     type: String,
-    enum: ["game1", "game2", "game3"],
+    enum: ["game1", "game2", "game3", "game4"],
     required: true,
   },
   createdAt: {
