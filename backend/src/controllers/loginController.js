@@ -29,9 +29,7 @@ export const login = async (req, res) => {
     }
 
     // Find user and select password, failedLoginAttempts, lockUntil
-    const user = await User.findOne({email}).select(
-      "+password failedLoginAttempts lockUntil"
-    );
+    const user = await User.findOne({email}).select("+password failedLoginAttempts lockUntil");
     if (!user) {
       return res
         .status(401)
