@@ -5,12 +5,7 @@ import {getCurrentLocation, isNewLocation} from "../utils/locationUtils.js";
 import {sendLocationAlert} from "../utils/emailUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
 
-// Helper: Track failed login attempts (in-memory, for demo)
-const loginAttempts = {};
-const MAX_ATTEMPTS = 5;
-const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
-
-// Login do usuário
+// User login controller
 export const login = async (req, res) => {
   try {
     let {email, password} = req.body;
@@ -33,41 +28,44 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check lockout
-    const now = Date.now();
-    if (loginAttempts[email] && loginAttempts[email].lockedUntil > now) {
-      return res.status(403).json({
-        status: "error",
-        message: `Account locked. Try again after ${new Date(
-          loginAttempts[email].lockedUntil
-        ).toLocaleTimeString()}`,
-      });
-    }
-
-    const user = await User.findOne({email}).select("+password");
+    // Find user and select password, failedLoginAttempts, lockUntil
+    const user = await User.findOne({email}).select(
+      "+password failedLoginAttempts lockUntil"
+    );
     if (!user) {
       return res
         .status(401)
         .json({status: "error", message: "Invalid email or password"});
     }
 
+    // Check lockout
+    const now = Date.now();
+    if (user.lockUntil && user.lockUntil > now) {
+      return res.status(403).json({
+        status: "error",
+        message: `Account locked. Try again after ${new Date(
+          user.lockUntil
+        ).toLocaleTimeString()}`,
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      // Track failed attempts
-      if (!loginAttempts[email])
-        loginAttempts[email] = {count: 0, lockedUntil: 0};
-      loginAttempts[email].count++;
-      if (loginAttempts[email].count >= MAX_ATTEMPTS) {
-        loginAttempts[email].lockedUntil = now + LOCK_TIME;
-        loginAttempts[email].count = 0;
+      user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+      if (user.failedLoginAttempts >= MAX_ATTEMPTS) {
+        user.lockUntil = now + LOCK_TIME;
+        user.failedLoginAttempts = 0;
       }
+      await user.save();
       console.warn(`Failed login for ${email}`);
       return res
         .status(401)
         .json({status: "error", message: "Invalid email or password"});
     }
     // Reset attempts on success
-    if (loginAttempts[email]) loginAttempts[email] = {count: 0, lockedUntil: 0};
+    user.failedLoginAttempts = 0;
+    user.lockUntil = null;
+    await user.save();
 
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({
