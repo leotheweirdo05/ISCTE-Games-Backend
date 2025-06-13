@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser"; // Add cookie-parser
 
 import authRoutes from "./routes/authRoutes.js";
 import scoreRoutes from "./routes/scoreRoutes.js";
@@ -14,6 +15,7 @@ dotenv.config();
 const app = express();
 
 // Middleware
+app.use(cookieParser()); // Add cookie-parser middleware
 app.use(
   cors({
     origin: "http://localhost",
@@ -42,7 +44,7 @@ mongoose
     retryWrites: true,
     w: "majority",
   })
-  .then(() => console.log("Conectado ao MongoDB com sucesso!"))
+  .then(() => console.log("Connected to MongoDB successfully"))
   .catch((err) => {
     console.error("Erro na conexão com MongoDB:", err.message);
     console.error("Stack trace:", err.stack);
@@ -51,7 +53,7 @@ mongoose
 // Rota raiz
 app.get("/", (req, res) => {
   res.json({
-    message: "Bem-vindo à API de autenticação",
+    message: "Welcome to the ISCTE Game API",
     endpoints: {
       register: "POST /api/auth/register",
       login: "POST /api/auth/login",
