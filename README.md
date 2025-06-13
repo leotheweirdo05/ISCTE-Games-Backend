@@ -9,19 +9,19 @@
 
 1. Clone este repositório em sua máquina usando o seguinte comando:
 ```bash
-git clone git@github.com:StorThiago/dsa-backend.git
+git clone git@github.com:leotheweirdo05/ISCTE-Games-Backend.git
 ```
 
 
 2. Entre no repositório clonado
 ```bash
-cd dsa-backend/
+cd ISCTE-Games-Backend/
 ```
 
 
 3. Crie o arquivo `.env` que armazena variáveis sensíveis/configuration a partir do exemplo:
 ```bash
-cd dsa-backend/backend/ && cp .env.example .env
+cd ISCTE-Games-Backend/backend/ && cp .env.example .env
 ```
 
 
@@ -49,11 +49,15 @@ docker-compose up -d --build
 http://localhost:3000/
 
 
+Claro! Aqui está a **seção "API References"** convertida para **Markdown**, alinhada com a tabela de endpoints que partilhaste:
+
+---
+
 8. API References
-Registar novo usuário
-```html
-POST /api/auth/register
-```
+
+Registar novo utilizador
+* **Endpoint:** `POST /api/auth/register`
+* **Descrição:** Regista um novo utilizador no sistema.
 ```json
 {
   "name": "Usuario Teste",
@@ -63,9 +67,8 @@ POST /api/auth/register
 ```
 
 Fazer login
-```html
-POST /api/auth/register
-```
+* **Endpoint:** `POST /api/auth/login`
+* **Descrição:** Autentica um utilizador e inicia sessão.
 ```json
 {
   "email": "teste@example.com",
@@ -73,31 +76,99 @@ POST /api/auth/register
 }
 ```
 
-## Folder struture
+Recuperar palavra-passe
+* **Endpoint:** `POST /api/auth/forgot-password`
+* **Descrição:** Envia um email com um link para redefinir a palavra-passe.
+```json
+{
+  "email": "teste@email.com"
+}
+```
+
+Submeter pontuação
+
+* **Endpoint:** `POST /api/scores/submit`
+* **Descrição:** Submete a pontuação de um jogo.
+```json
+{
+  "game": "memory",
+  "score": 150,
+  "userId": "665f3abc1234567890"
+}
+```
+
+Consultar leaderboard
+
+* **Endpoint:** `GET /api/scores/leaderboard`
+* **Descrição:** Retorna o leaderboard global.
+```json
+{
+  "game": "pinball",
+  "all": "true"
+}
+```
+
+Pontuações do utilizador
+
+* **Endpoint:** `GET /api/scores/user-scores`
+* **Descrição:** Retorna as pontuações de um utilizador específico.
+```json
+{
+  "game": "2048",
+  "userId": "665f3abc1234567890"
+}
+```
+
+Terminar sessão (logout)
+* **Endpoint:** `POST /api/auth/logout`
+* **Descrição:** Termina a sessão do utilizador.
+* **Autenticação:** Necessita do cookie de sessão enviado automaticamente pelo navegador.
+
+## Folder structure
 
 ```bash
-dsa-backend/
+ISCTE-Games-Backend/
 ├── docker-compose.yml
-├── backend/
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── src/
-│   │   ├── app.js
-│   │   ├── models/
-│   │   │   └── User.js
-│   │   ├── controllers/
-│   │   │   └── authController.js
-│   │   ├── routes/
-│   │   │   └── authRoutes.js
-│   │   └── config/
-│   │       └── db.js
-│   └── .env
-└── mongo-init.js
+├── mongo-init.js
+├── README.md
+│
+└── backend/
+    ├── .env
+    ├── .env.example
+    ├── Dockerfile
+    ├── package.json
+    ├── app.js
+    │
+    ├── config/
+    │   └── db.js
+    │
+    ├── controllers/
+    │   ├── forgotPasswordController.js
+    │   ├── loginController.js
+    │   ├── logoutController.js
+    │   ├── registerController.js
+    │   └── scoreController.js
+    │
+    ├── middleware/
+    │   └── authenticate.js
+    │
+    ├── models/
+    │   ├── Score.js
+    │   └── User.js
+    │
+    ├── routes/
+    │   ├── authRoutes.js
+    │   └── scoreRoutes.js
+    │
+    └── utils/
+        ├── cookieOptions.js
+        ├── emailUtils.js
+        └── locationUtils.js
 ```
 
 
 ```bash
-dsa-backend/
+ISCTE-Games-Backend/
 ├── docker-compose.yml          # Configuração do ambiente Docker
 ├── backend/                    # Pasta do aplicativo Node.js
 └── mongo-init.js               # Script de inicialização do MongoDB
@@ -171,5 +242,6 @@ entry point of the application. Add your endpoints / routes
 
 ## Autores
 
-- [@StorThiago](https://www.github.com/StorThiago)
-- [@joaomatosiscte](https://www.github.com/joaomatosiscte)
+- [@leotheweirdo05](https://www.github.com/leotheweirdo05)
+- [@guilherme-catoja](https://www.github.com/guilherme-catoja)
+- [@FederEx18](https://github.com/FederEx18)
