@@ -3,6 +3,8 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import authRoutes from "./routes/authRoutes.js";
 import scoreRoutes from "./routes/scoreRoutes.js";
@@ -12,12 +14,25 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: "http://localhost",
-  credentials: true // Allow cookies to be sent with requests
-}));
+app.use(
+  cors({
+    origin: "http://localhost",
+    credentials: true, // Allow cookies to be sent with requests
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(helmet());
+
+// Rate limiter for auth endpoints (5 requests per minute per IP)
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5,
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later.",
+  },
+});
 
 // Conexão com o MongoDB
 mongoose
@@ -45,7 +60,7 @@ app.get("/", (req, res) => {
 });
 
 // Rotas da API
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/scores", scoreRoutes);
 
 const PORT = process.env.PORT || 3000;
