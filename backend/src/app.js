@@ -5,7 +5,6 @@ import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import cookieParser from "cookie-parser"; // Add cookie-parser
 
 import authRoutes from "./routes/authRoutes.js";
 import scoreRoutes from "./routes/scoreRoutes.js";
@@ -15,7 +14,6 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cookieParser()); // Add cookie-parser middleware
 app.use(
   cors({
     origin: "http://localhost",
@@ -44,7 +42,7 @@ mongoose
     retryWrites: true,
     w: "majority",
   })
-  .then(() => console.log("Connected to MongoDB successfully"))
+  .then(() => console.log("Conectado ao MongoDB com sucesso!"))
   .catch((err) => {
     console.error("Erro na conexão com MongoDB:", err.message);
     console.error("Stack trace:", err.stack);
@@ -53,10 +51,15 @@ mongoose
 // Rota raiz
 app.get("/", (req, res) => {
   res.json({
-    message: "Welcome to the ISCTE Game API",
+    message: "Bem-vindo à API de autenticação",
     endpoints: {
       register: "POST /api/auth/register",
       login: "POST /api/auth/login",
+      forgotPassword: "POST /api/auth/forgot-password",
+      logout: "POST /api/auth/logout",
+      submitScore: "POST /api/scores/submit",
+      getLeaderboard: "GET /api/scores/leaderboard?game=GAME_NAME&all=true/false",
+      getUserScores: "GET /api/scores/user-scores?game=GAME_NAME&userId=USER_ID",
     },
   });
 });

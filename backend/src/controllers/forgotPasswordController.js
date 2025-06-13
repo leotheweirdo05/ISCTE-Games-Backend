@@ -30,7 +30,7 @@ export const forgotPassword = async (req, res) => {
 
       // Send email
       const resetUrl = `${
-        process.env.FRONTEND_URL || "http://localhost:3001"
+        process.env.FRONTEND_URL || "http://localhost"
       }/reset-password/${token}`;
       try {
         await sendResetPasswordEmail(user.email, resetUrl);
