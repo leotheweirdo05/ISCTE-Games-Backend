@@ -5,6 +5,10 @@ import {getCurrentLocation, isNewLocation} from "../utils/locationUtils.js";
 import {sendLocationAlert} from "../utils/emailUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
 
+
+const MAX_ATTEMPTS = 5;
+const LOCK_TIME = 15 * 60 * 1000;
+
 // User login controller
 export const login = async (req, res) => {
   try {
