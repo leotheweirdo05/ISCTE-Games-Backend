@@ -1,50 +1,72 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const morgan = require('morgan');
-const cors = require('cors');
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import morgan from "morgan";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
-const authRoutes = require('./routes/authRoutes');
+import authRoutes from "./routes/authRoutes.js";
+import scoreRoutes from "./routes/scoreRoutes.js";
+
+dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost",
+    credentials: true, // Allow cookies to be sent with requests
+  })
+);
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
+app.use(helmet());
 
-
-// Conexão com o MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  auth: {
-    username: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD
+// Rate limiter for auth endpoints (5 requests per minute per IP)
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5,
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later.",
   },
-  authSource: "auth_db",
-  retryWrites: true,
-  w: "majority"
-})
-.then(() => console.log('MongoDb Connected Successfully!'))
-.catch(err => {
-  console.error('Error connecting with MongoDB:', err.message);
-  console.error('Stack trace:', err.stack);
 });
 
-  
+// Conexão com o MongoDB
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    retryWrites: true,
+    w: "majority",
+  })
+  .then(() => console.log("Conectado ao MongoDB com sucesso!"))
+  .catch((err) => {
+    console.error("Erro na conexão com MongoDB:", err.message);
+    console.error("Stack trace:", err.stack);
+  });
+
 // Rota raiz
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.json({
-    message: 'Bem-vindo à API de autenticação',
+    message: "Bem-vindo à API de autenticação",
     endpoints: {
-      register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login'
-    }
+      register: "POST /api/auth/register",
+      login: "POST /api/auth/login",
+      forgotPassword: "POST /api/auth/forgot-password",
+      logout: "POST /api/auth/logout",
+      submitScore: "POST /api/scores/submit",
+      getLeaderboard: "GET /api/scores/leaderboard?game=GAME_NAME&all=true/false",
+      getUserScores: "GET /api/scores/user-scores?game=GAME_NAME&userId=USER_ID",
+    },
   });
 });
 
-
 // Rotas da API
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/scores", scoreRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
