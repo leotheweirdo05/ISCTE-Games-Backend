@@ -49,10 +49,6 @@ docker-compose up -d --build
 http://localhost:3000/
 
 
-Claro! Aqui está a **seção "API References"** convertida para **Markdown**, alinhada com a tabela de endpoints que partilhaste:
-
----
-
 8. API References
 
 Registar novo utilizador
