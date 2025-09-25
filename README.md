@@ -184,7 +184,7 @@ ISCTE-Games-Backend/
 - **Função**: Script executado quando o MongoDB inicia pela primeira vez
 - **O que faz**:
   - Cria usuários e permissões
-  - Inicializa coleções necessári
+  - Inicializa coleções necessárias
 
 
 ## Pasta backend/ (Aplicação Node.js)
